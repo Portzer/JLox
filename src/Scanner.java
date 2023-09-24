@@ -54,13 +54,44 @@ public class Scanner {
                 break;
             case '"':string();break;
             default:
+                if (isDigit(c)) {
+                    number();
+                }
                 Lox.error(line, "Unexpect character");
                 break;
         }
     }
 
-    private void string() {
+    private void number() {
+        while (isDigit(peek())) advance();
+        if (peek() == '.' && isDigit(peekNext())) {
+            advance();
+            while (isDigit(peek())) advance();
+        }
+        addToken(TokenType.NUMBER, Double.parseDouble(source.substring(start, current)));
+    }
 
+    private char peekNext() {
+        if (current+1>= source.length()) return '\n';
+        return source.charAt(current + 1);
+    }
+
+    private boolean isDigit(char c) {
+        return c > '0' && c <= '9';
+    }
+
+    private void string() {
+        while (advance() != '"' && !isAtEnd()) {
+            if(advance()=='\n') line++;
+            advance();
+        }
+        if (isAtEnd()) {
+            Lox.error(line, "Unterminated string.");
+            return;
+        }
+        advance();
+        String value = source.substring(start + 1, current - 1);
+        addToken(TokenType.STRING, value);
     }
 
     private char peek() {
