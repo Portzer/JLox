@@ -83,8 +83,9 @@ public class Scanner {
                     number();
                 } else if (isAlpha(c)) {
                     identifier();
+                }else {
+                    Lox.error(line, "Unexpect character");
                 }
-                Lox.error(line, "Unexpect character");
                 break;
         }
     }
