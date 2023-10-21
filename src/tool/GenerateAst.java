@@ -19,6 +19,9 @@ public class GenerateAst {
                         "Grouping : Expr expression",
                         "Literal : Object value",
                         "Unary    : Token operator, Expr right"));
+        defineAst(outputDir,"Stmt",
+                Arrays.asList(  "Expression : Expr expression",
+                                "Print      : Expr expression"));
     }
 
     private static void defineAst(String outputDir, String baseName, List<String> types) throws IOException {
@@ -71,7 +74,6 @@ public class GenerateAst {
         }
 
         writer.println("    }");
-        // 新增部分开始
         // Visitor pattern.
         writer.println();
         writer.println("    @Override");

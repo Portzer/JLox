@@ -1,8 +1,9 @@
 import com.sun.org.apache.xpath.internal.operations.Bool;
 
+import java.util.List;
 import java.util.Optional;
 
-public class Interpreter implements Expr.Visitor<Object> {
+public class Interpreter implements Expr.Visitor<Object> ,Stmt.Visitor<Void>{
 
     @Override
     public Object visitBinaryExpr(Expr.Binary expr) {
@@ -54,13 +55,18 @@ public class Interpreter implements Expr.Visitor<Object> {
         return a.equals(b);
     }
 
-    void interpret(Expr expression) {
+    void interpret(List<Stmt> stmts) {
         try {
-            Object value = evaluate(expression);
-            System.out.println(stringify(value));
+            for (Stmt stmt : stmts) {
+                execute(stmt);
+            }
         } catch (RunTimeError error) {
             Lox.runtimeError(error);
         }
+    }
+
+    private void execute(Stmt stmt) {
+        stmt.accept(this);
     }
 
     private String stringify(Object value) {
@@ -112,5 +118,19 @@ public class Interpreter implements Expr.Visitor<Object> {
         if(right==null) return false;
         if(right instanceof Boolean) return (boolean) right;
         return true;
+    }
+
+    @Override
+    public Void visitExpressionStmt(Stmt.Expression stmt) {
+        Object value = evaluate(stmt.expression);
+        System.out.println(stringify(value));
+        return null;
+    }
+
+    @Override
+    public Void visitPrintStmt(Stmt.Print stmt) {
+        Object value = evaluate(stmt.expression);
+        System.out.println(stringify(value));
+        return null;
     }
 }

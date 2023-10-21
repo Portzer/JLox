@@ -4,6 +4,7 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.nio.charset.Charset;
 import java.nio.file.Files;
+import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.List;
 
@@ -48,9 +49,9 @@ public class Lox {
         Scanner scanner = new Scanner(source);
         List<Token> tokens = scanner.getTokens();
         Parser parser = new Parser(tokens);
-        Expr expression = parser.parse();
+        List<Stmt> stmts = parser.parse();
         if(hadError) return;
-        INTERPRETER.interpret(expression);
+        INTERPRETER.interpret(stmts);
     }
 
     public static void error(int line, String message) {
