@@ -15,9 +15,30 @@ public class Parser {
     List<Stmt> parse(){
         List<Stmt> stmts = new ArrayList<>();
         while (!isAtEnd()) {
-            stmts.add(statement());
+            stmts.add(declaration());
         }
         return stmts;
+    }
+
+    private Stmt declaration() {
+        try {
+            if (match(TokenType.VAR)) return varDeclaration();
+            return statement();
+        } catch (ParseError error) {
+            synchronize();
+            return null;
+        }
+
+    }
+
+    private Stmt varDeclaration() {
+        Token name = consume(TokenType.IDENTIFIER, "Expect variable name.");
+        Expr initializer = null;
+        if (match(TokenType.EQUAL)) {
+            initializer = expression();
+        }
+        consume(TokenType.SEMICOLON, "Expect ';' after variable declaration");
+        return new Stmt.Var(name, initializer);
     }
 
     private Stmt statement() {
