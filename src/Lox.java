@@ -2,6 +2,7 @@ import javax.xml.stream.FactoryConfigurationError;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.net.URI;
 import java.nio.charset.Charset;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -45,8 +46,12 @@ public class Lox {
         if(hadRunTimeEError) System.exit(70);
     }
 
-    private static void run(String source) {
-        Scanner scanner = new Scanner(source);
+    private static void run(String source) throws IOException {
+        String path = "D:\\CS\\Code\\Lox\\JLox\\resource\\demo1.text";
+        Path path1 = Paths.get(path);
+        byte[] bytes = Files.readAllBytes(path1);
+        String s = new String(bytes);
+        Scanner scanner = new Scanner(s);
         List<Token> tokens = scanner.getTokens();
         Parser parser = new Parser(tokens);
         List<Stmt> stmts = parser.parse();

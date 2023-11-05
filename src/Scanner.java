@@ -154,6 +154,7 @@ public class Scanner {
 
     private char advance() {
         current++;
+        System.out.println(source.charAt(current-1));
         return source.charAt(current - 1);
     }
 

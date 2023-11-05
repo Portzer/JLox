@@ -5,6 +5,15 @@ import java.util.Optional;
 
 public class Interpreter implements Expr.Visitor<Object> ,Stmt.Visitor<Void>{
 
+    private Environment environment = new Environment();
+
+    @Override
+    public Object visitAssignExpr(Expr.Assign expr) {
+        Object value = evaluate(expr.value);
+        environment.assign(expr.name, expr.value);
+        return value;
+    }
+
     @Override
     public Object visitBinaryExpr(Expr.Binary expr) {
         Object left = evaluate(expr.left);
@@ -111,7 +120,7 @@ public class Interpreter implements Expr.Visitor<Object> ,Stmt.Visitor<Void>{
 
     @Override
     public Object visitVariableExpr(Expr.Variable expr) {
-        return null;
+        return environment.get(expr.name);
     }
 
     private void checkNumberAndOperand(Token operator, Object right) {
@@ -123,6 +132,24 @@ public class Interpreter implements Expr.Visitor<Object> ,Stmt.Visitor<Void>{
         if(right==null) return false;
         if(right instanceof Boolean) return (boolean) right;
         return true;
+    }
+
+    @Override
+    public Void visitBlockStmt(Stmt.Block stmt) {
+        execute(stmt.statement, new Environment(environment));
+        return null;
+    }
+
+    private void execute(List<Stmt> statement, Environment environment) {
+        Environment previous = this.environment;
+        try {
+            this.environment = environment;
+            for (Stmt stmt : statement) {
+                execute(stmt);
+            }
+        }finally {
+            this.environment = previous;
+        }
     }
 
     @Override
@@ -141,6 +168,11 @@ public class Interpreter implements Expr.Visitor<Object> ,Stmt.Visitor<Void>{
 
     @Override
     public Void visitVarStmt(Stmt.Var stmt) {
+        Object value = null;
+        if (stmt.initializer != null) {
+            value = evaluate(stmt.initializer);
+        }
+        environment.define(stmt.name.lexeme, value);
         return null;
     }
 }
